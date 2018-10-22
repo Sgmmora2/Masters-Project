@@ -3,11 +3,6 @@ import pandas as pd
 import os as os
 import matplotlib.pyplot as pyplot
 import math as math
-import sys
-
-#Custom functions
-os.chdir(os.path.dirname(sys.argv[0]))
-sys.path.append('.\functionLibrary')
 
 os.chdir('Data')
 myarr = np.load('project data.npy')
@@ -37,15 +32,21 @@ suffix4vc = ['p','px','py','pz']
 #Arrays to allow me to reference properties of particles more systematically
 	 
 for x in suffix4vc:
-	df[('lepcombined%s') % (x)] = df[('lep0%s') % (x)] + df[('lep1%s') % (x)]
+    df[('lepcombined%s') % (x)] = df[('lep0%s') % (x)] + df[('lep1%s') % (x)]
     df[('jetcombined%s') % (x)] = df[('jet0%s') % (x)] + df[('jet1%s') % (x)]
     df[('allcombined%s' % (x))] = df[('lep0%s') % (x)] + df[('lep1%s') % (x)] + df[('jet0%s') % (x)] + df[('jet1%s') % (x)]
+    
 #Assume E is equal to p
+def invMass(df,system,p,px,py,pz):
+    return (df['%s%s' % (system,p)]*df['%s%s' % (system,p)] - df['%s%s' % (system,px)]*df['%s%s' % (system,px)] - df['%s%s' % (system,py)]*df['%s%s' % (system,py)] - df['%s%s' % (system,pz)]*df['%s%s' % (system,pz)]).apply(math.sqrt)
+
 df['lepcombinedinvariantmass'] = invMass(df,'lepcombined','p','px','py','pz')
 df['jetcombinedinvariantmass'] = invMass(df,'jetcombined','p','px','py','pz')
 df['allcombinedinvariantmass'] = invMass(df,'allcombined','p','px','py','pz')
+
 invariantmasses = [df.label, df.jetcombinedinvariantmass, df.lepcombinedinvariantmass, df.allcombinedinvariantmass]
 invariantmassesdf = pd.DataFrame(data=invariantmasses, columns=['label','jet','lep','combined'])
+
 signal = df[df.label >= 300000]
 background = df[df.label <= 300000]
 
