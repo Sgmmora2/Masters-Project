@@ -1,0 +1,7 @@
+Experimented with data structures in pandas
+
+converted to linear momentum from pseudorapidity phi and momentum
+
+experimented with publically available neural net code for the sample given
+
+plotted histograms of invariants masses of the system
