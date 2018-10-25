@@ -54,13 +54,13 @@ background = df[df.label <= 300000]
 def histweighteddrac(data,weight):
     #ad hoc modification of the freedman diaconic formula for the weighted data to decide bin sizes
     constant = 1
-    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/3)
+    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/4)
     binn = np.arange(min(data),max(data)+binsize,binsize)
     pyplot.hist(data,bins=binn, weights = weight, stacked = True, )
 def histweighteddracnostack(data,weight):
     #ad hoc modification of the freedman diaconic formula for the weighted data to decide bin sizes
     constant = 1
-    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/3)
+    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/4)
     binn = np.arange(min(data),max(data)+binsize,binsize)
     pyplot.hist(data,bins=binn, weights = weight, stacked = False, )
 
@@ -130,28 +130,40 @@ histweighteddrac(df.jetcombinedinvariantmass,df.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass jet / All events')
 pyplot.savefig('testLepfull.png')
+histogramdata = pd.DataFrame()
+
 
 for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
     signalplot = df[df.label == x]
+    
     pyplot.figure(9+4*y)
     histweighteddrac(signalplot.allcombinedinvariantmass,signalplot.weight)
     pyplot.ylabel('Frequency')
     pyplot.xlabel('Combined Mass All / %s' % x)
     pyplot.savefig('%stestallfull.png' % x)
+    
+    
     pyplot.figure(10+4*y)
     histweighteddrac(signalplot.lepcombinedinvariantmass,signalplot.weight)
     pyplot.ylabel('Frequency')
     pyplot.xlabel('Combined Mass lep / %s' % x)
     pyplot.savefig('%stestlepfull.png' % x)
+    
+    
+    
     pyplot.figure(11+4*y)
     histweighteddrac(signalplot.jetcombinedinvariantmass,signalplot.weight)
     pyplot.ylabel('Frequency')
     pyplot.xlabel('Combined Mass jet / %s' % x)
     pyplot.savefig('%stestjetfull.png' % x)
+    
+    
+    
     pyplot.figure(12+4*y)
     histweighteddracnostack(signalplot.jetcombinedinvariantmass,signalplot.weight)
     histweighteddracnostack(signalplot.lepcombinedinvariantmass,signalplot.weight)
     histweighteddracnostack(signalplot.allcombinedinvariantmass,signalplot.weight)
+    
     pyplot.ylabel('Frequency')
     pyplot.xlabel('Combined Mass jet / %s' % x)
     pyplot.savefig('%scombined.png' % x)
