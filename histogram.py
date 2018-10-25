@@ -3,6 +3,7 @@ import pandas as pd
 import os as os
 import matplotlib.pyplot as pyplot
 import math as math
+import scipy.stats as sp
 
 os.chdir('Data')
 myarr = np.load('project data.npy')
@@ -50,66 +51,112 @@ invariantmassesdf = pd.DataFrame(data=invariantmasses, columns=['label','jet','l
 signal = df[df.label >= 300000]
 background = df[df.label <= 300000]
 
+def histweighteddrac(data,weight):
+    #ad hoc modification of the freedman diaconic formula for the weighted data to decide bin sizes
+    constant = 1
+    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/3)
+    binn = np.arange(min(data),max(data)+binsize,binsize)
+    pyplot.hist(data,bins=binn, weights = weight, stacked = True, )
+def histweighteddracnostack(data,weight):
+    #ad hoc modification of the freedman diaconic formula for the weighted data to decide bin sizes
+    constant = 1
+    binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/3)
+    binn = np.arange(min(data),max(data)+binsize,binsize)
+    pyplot.hist(data,bins=binn, weights = weight, stacked = False, )
+
 pyplot.figure(0)
-pyplot.hist(signal.allcombinedinvariantmass, bins=200, weights = signal.weight)
+histweighteddrac(signal.allcombinedinvariantmass, signal.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass All / Total Signal')
 pyplot.savefig('testallsignal.png')
 pyplot.figure(1)
-pyplot.hist(signal.lepcombinedinvariantmass, bins=200, weights = signal.weight)
+histweighteddrac(signal.lepcombinedinvariantmass,signal.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass Jet / Total Signal')
 pyplot.savefig('testJetsignal.png')
 pyplot.figure(2)
-pyplot.hist(signal.jetcombinedinvariantmass, bins=200, weights = signal.weight)
+histweighteddrac(signal.jetcombinedinvariantmass,signal.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass Lep / Total Signal')
 pyplot.savefig('testLepsignal.png')
 
 pyplot.figure(0)
-pyplot.hist(background.allcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.allcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
-pyplot.xlabel('Combined Mass All / Background')
+pyplot.xlabel('Combined Mass All / SigandBack')
 pyplot.savefig('testallsigandback.png')
+pyplot.legend(('signal','background'))
 pyplot.figure(1)
-pyplot.hist(background.lepcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.lepcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
-pyplot.xlabel('Combined Mass Lep /Background')
+pyplot.xlabel('Combined Mass Lep /SigandBack')
 pyplot.savefig('testJetsigandback.png')
+pyplot.legend(('signal','background'))
 pyplot.figure(2)
-pyplot.hist(background.jetcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.jetcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
-pyplot.xlabel('Combined Mass jet / Background')
+pyplot.xlabel('Combined Mass jet / SigandBack')
+pyplot.legend(('signal','background'))
 pyplot.savefig('testLepsigandback.png')
 
 pyplot.figure(3)
-pyplot.hist(background.allcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.allcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass All / Signal and Background Superimposed')
 pyplot.savefig('testallback.png')
 pyplot.figure(4)
-pyplot.hist(background.lepcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.lepcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass lep / Signal and Background Superimposed')
 pyplot.savefig('testJetback.png')
 pyplot.figure(5)
-pyplot.hist(background.jetcombinedinvariantmass, bins=200, weights = background.weight)
+histweighteddrac(background.jetcombinedinvariantmass,background.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass jet / Signal and Background Superimposed')
 pyplot.savefig('testLepback.png')
 
 pyplot.figure(6)
-pyplot.hist(df.allcombinedinvariantmass, bins=200, weights = df.weight)
+histweighteddrac(df.allcombinedinvariantmass,df.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass All / All events')
 pyplot.savefig('testallfull.png')
 pyplot.figure(7)
-pyplot.hist(df.lepcombinedinvariantmass, bins=200, weights = df.weight)
+histweighteddrac(df.lepcombinedinvariantmass,df.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass lep / All events')
 pyplot.savefig('testJetfull.png')
 pyplot.figure(8)
-pyplot.hist(df.jetcombinedinvariantmass, bins=200, weights = df.weight)
+histweighteddrac(df.jetcombinedinvariantmass,df.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass jet / All events')
 pyplot.savefig('testLepfull.png')
+
+for x,y in zip(signal.label.unique(),range(len(signal.label.unique())-1)):
+    signalplot = df[df.label == x]
+    pyplot.figure(9+4*y)
+    histweighteddrac(signalplot.allcombinedinvariantmass,signalplot.weight)
+    pyplot.ylabel('Frequency')
+    pyplot.xlabel('Combined Mass All / %s' % x)
+    pyplot.savefig('%stestallfull.png' % x)
+    pyplot.figure(10+4*y)
+    histweighteddrac(signalplot.lepcombinedinvariantmass,signalplot.weight)
+    pyplot.ylabel('Frequency')
+    pyplot.xlabel('Combined Mass lep / %s' % x)
+    pyplot.savefig('%stestlepfull.png' % x)
+    pyplot.figure(11+4*y)
+    histweighteddrac(signalplot.jetcombinedinvariantmass,signalplot.weight)
+    pyplot.ylabel('Frequency')
+    pyplot.xlabel('Combined Mass jet / %s' % x)
+    pyplot.savefig('%stestjetfull.png' % x)
+    pyplot.figure(12+4*y)
+    histweighteddracnostack(signalplot.jetcombinedinvariantmass,signalplot.weight)
+    histweighteddracnostack(signalplot.lepcombinedinvariantmass,signalplot.weight)
+    histweighteddracnostack(signalplot.allcombinedinvariantmass,signalplot.weight)
+    pyplot.ylabel('Frequency')
+    pyplot.xlabel('Combined Mass jet / %s' % x)
+    pyplot.savefig('%scombined.png' % x)
+    pyplot.legend(('jet','lep','combined'))
+    
+    
+#From these plots the peaks on the jets and the combined peaks are quite clear and there's only one so some method of automatically obtaining peaks from the base data will be employed
+    
