@@ -131,7 +131,7 @@ pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass jet / All events')
 pyplot.savefig('testLepfull.png')
 
-for x,y in zip(signal.label.unique(),range(len(signal.label.unique())-1)):
+for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
     signalplot = df[df.label == x]
     pyplot.figure(9+4*y)
     histweighteddrac(signalplot.allcombinedinvariantmass,signalplot.weight)
