@@ -130,7 +130,7 @@ histweighteddrac(df.jetcombinedinvariantmass,df.weight)
 pyplot.ylabel('Frequency')
 pyplot.xlabel('Combined Mass jet / All events')
 pyplot.savefig('testLepfull.png')
-histogramdata = pd.DataFrame()
+histogramdata = pd.DataFrame(columns = ("Label","N"))
 
 
 for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
@@ -168,7 +168,6 @@ for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
     pyplot.xlabel('Combined Mass jet / %s' % x)
     pyplot.savefig('%scombined.png' % x)
     pyplot.legend(('jet','lep','combined'))
-    
-    
+    histogramdata.loc[y] = ([x,np.sum(signalplot.weight)])
+        
 #From these plots the peaks on the jets and the combined peaks are quite clear and there's only one so some method of automatically obtaining peaks from the base data will be employed
-    
