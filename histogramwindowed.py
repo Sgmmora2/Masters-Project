@@ -153,10 +153,7 @@ signal = signal[(signal.jet0pt*signal.jet0pt+
                 signal.allcombinedinvariantmass > 0.4]
 
 for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
-#for x in [308527]:
     signalplot = signal[signal.label == x]
-    
-    #0.85 · mH −25 GeV< mbb < mH +50 GeV
     
     if x in higgsdic:
         signalplot = signalplot[(signalplot.jetcombinedinvariantmass >= 0.85*higgsdic.get(x)-25) & (signalplot.jetcombinedinvariantmass <= higgsdic.get(x)+50)]
