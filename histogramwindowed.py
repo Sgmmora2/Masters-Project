@@ -67,7 +67,7 @@ background = df[df.label <= 300000]
 
 def histweighteddrac(data,weight):
     #ad hoc modification of the freedman diaconic formula for the weighted data to decide bin sizes
-    constant = 1
+    constant = 3
     binsize = constant*2*sp.stats.iqr(data)/pow(len(data),1/4)
     binn = np.arange(min(data),max(data)+binsize,binsize)
     pyplot.hist(data,bins=binn, weights = weight, stacked = True, histtype = 'step')
@@ -191,7 +191,7 @@ for x,y in zip(signal.label.unique(),range(len(signal.label.unique()))):
     
     pyplot.ylabel('Frequency')
     pyplot.xlabel('Combined Mass jet / %s' % x)
-    pyplot.savefig('%scombined.png' % x)
     pyplot.legend(('jet','lep','combined'))
+    pyplot.savefig('%scombined.png' % x)
         
 #From these plots the peaks on the jets and the combined peaks are quite clear and there's only one so some method of automatically obtaining peaks from the base data will be employed
