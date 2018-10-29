@@ -79,11 +79,11 @@ for distance in range(K):
     if learn == True:
         #4 layers of dense sigmoid activated neurons with 12 on each layer
         
-        model.add(dense(12, input_dim=1, activation ='sigmoid'))
-        model.add(dense(12, activation='sigmoid'))
-        model.add(dense(12, activation='sigmoid'))
-        model.add(dense(12, activation='sigmoid'))
-        model.add(dense(1,activation = 'sigmoid'))
+        model.add(dense(12, input_dim=1, activation ='relu'))
+        model.add(dense(12, activation='relu'))
+        model.add(dense(12, activation='relu'))
+        model.add(dense(12, activation='relu'))
+        model.add(dense(1,activation = 'relu'))
         model.compile('SGD','mean_squared_error', metrics=['accuracy'])
         model.fit(array.value,array.label, epochs = 20, batch_size = 1, verbose = Do_Print)
         model.save('model')

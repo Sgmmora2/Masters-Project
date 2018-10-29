@@ -1,0 +1,3 @@
+Completed ROC test using two guassians to simulate score spreads and generated theoretical ROC curves
+
+Completed first Keras script applied to the set of gaussians in a supervised network (4 layers, 12 nodes per layer, rectified activation function, sigmoid end)
