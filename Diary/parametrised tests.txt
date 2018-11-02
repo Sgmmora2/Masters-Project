@@ -1,0 +1,1 @@
+mh and ma set to same distribution as signal, better fit than random, both paramaterised models fall apart if mH and mA are turned into random numbers - reliant on them

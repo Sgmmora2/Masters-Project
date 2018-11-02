@@ -14,93 +14,73 @@ import random
 import matplotlib.pyplot as pyplot
 import sklearn.metrics
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
 np.random.seed(123456789)
 K=10
 learn=False
-auc_score_array = np.empty(K)
+auc_score = [0,0,0]
 
 #Controls verbose mode
-Do_Print = 0
+Do_Print = 1
 
-for distance in range(K):
+
+#Background frequency
+
+backgroundN = 1000
+
+#Signal Frequency
+
+signalN = 1000
+
+N=signalN+backgroundN
+
+
+#Define array
+
+array = []
+
+for i in range(backgroundN):
+    array.append([0,np.random.normal(0),np.random.normal(0),np.random.normal(0),np.random.normal(0),np.random.normal(0),np.random.normal(0)])
+for i in range(signalN):
+    array.append([1,np.random.normal(1),np.random.normal(0),np.random.normal(1),np.random.normal(0),np.random.normal(1),np.random.normal(0)])
 
     
-    #Background frequency
+random.shuffle(array)
+
+ROCarray = []
+#create ROC array
+array = pd.DataFrame(array,columns = ['label','ytest','xtest','yeval','xeval','yval','xval'])
+model = sequential()
+if learn == True:
+    #4 layers of dense relu activated neurons with 12 on each layer
     
-    backgroundN = 150
+    model.add(dense(12, input_dim=2, activation ='relu'))
+    model.add(dense(1,activation = 'sigmoid'))
+    model.compile('SGD','mean_squared_error', metrics=['accuracy'])
+    model.fit(array[['xtest','ytest']],array.label, epochs = 500, batch_size = 10, verbose = Do_Print,validation_data = (array[['xval','yval']],array.label))
+    model.save('model')
+else:
+    model=load_model('model')
     
-    #Signal Frequency
-    
-    signalN = 150
-    
-    N=signalN+backgroundN
-    
-    #Define Array
-    
-    array = []
-    evalarray=[]
-    
-    for i in range(backgroundN):
-        array.append([0,np.random.normal()])
-    for i in range(signalN):
-        array.append([1,np.random.normal(distance)])
-    random.shuffle(array)
-    
-    for i in range(backgroundN):
-        evalarray.append([0,np.random.normal()])
-    for i in range(signalN):
-        evalarray.append([1,np.random.normal(distance)])
-    random.shuffle(evalarray)
-    
-    ROCarray = []
-    #create ROC array
-    
-    #for i in np.arange(-5,5,0.05):
-    #    falsepositive = 0
-    #    positive = 0
-    #    for j in range(N):
-    #        if i<array[j][1]:
-    #            if array[j][0] == 'background':
-    #                falsepositive+=1
-    #            if array[j][0] == 'signal':
-    #                positive+=1
-    #    ROCarray.append([falsepositive/backgroundN,positive/signalN])
-    #
-    #ROCarray = np.array(ROCarray)    
-    #pyplot.scatter(ROCarray[:,0],ROCarray[:,1])
-    #pyplot.plot([0,1])
-    #pyplot.xlabel('false positive')
-    #pyplot.ylabel('positive')
-    #pyplot.savefig('ROCgaussian')
-    
-    array = pd.DataFrame(array,columns = ['label','value'])
-    evalarray = pd.DataFrame(evalarray,columns = ['label','value'])
-    model = sequential()
-    if learn == True:
-        #4 layers of dense sigmoid activated neurons with 12 on each layer
-        
-        model.add(dense(12, input_dim=1, activation ='relu'))
-        model.add(dense(12, activation='relu'))
-        model.add(dense(12, activation='relu'))
-        model.add(dense(12, activation='relu'))
-        model.add(dense(1,activation = 'relu'))
-        model.compile('SGD','mean_squared_error', metrics=['accuracy'])
-        model.fit(array.value,array.label, epochs = 20, batch_size = 1, verbose = Do_Print)
-        model.save('model')
-    else:
-        model=load_model('model')
-    scores = model.predict(evalarray.value)
-    scores.resize(300,)
-    a,b,c = sklearn.metrics.roc_curve(evalarray.label , scores)
-    auc_score_array[distance] = round(sklearn.metrics.roc_auc_score(evalarray.label,scores),3)
-    pyplot.plot(a,b)
-        
+scores = model.predict(array[['xeval','yeval']])
+aneuraleval,bneuraleval,cneuraleval = sklearn.metrics.roc_curve(array.label , scores)
+auc_score[0] = round(sklearn.metrics.roc_auc_score(array.label,scores),3)
+pyplot.plot(aneuraleval,bneuraleval)
+
+scores = model.predict(array[['xtest','ytest']])
+aneuraltest,bneuraltest,cneuraltest = sklearn.metrics.roc_curve(array.label , scores)
+auc_score[1] = round(sklearn.metrics.roc_auc_score(array.label,scores),3)
+pyplot.plot(aneuraltest,bneuraltest) 
+
+aoptimal,boptimal,coptimal = sklearn.metrics.roc_curve(array.label , array.ytest)
+auc_score[2] = round(sklearn.metrics.roc_auc_score(array.label,array.ytest),3) 
+pyplot.plot(aoptimal,boptimal)
     
 pyplot.plot([0,1])
 pyplot.xlabel('FPR')
 pyplot.ylabel('PR')
+pyplot.legend(['neural eval auc = %s' % auc_score[0], 'neural test auc = %s' % auc_score[1], 'optimal auc = %s' % auc_score[2]])
     
-    
-pyplot.legend(['Distance %s auc_score %s' % (i,auc_score_array[i]) for i in range(K)])
-pyplot.savefig('ROC for guassians (σ=1) of varying seperation neural net version')
+pyplot.savefig('ROC for guassians seperated by 1 unit (σ=1) comparing neural network to the optimal solution.pdf', format = 'pdf')
     

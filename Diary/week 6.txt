@@ -1,0 +1,10 @@
+Used the mA mH array provided and some "out of the box" neural network tools to better understand the data given and pull out what network might be better
+
+results, 3 layer deep, adam algorithm, relu activated neurons, 64 neurons per node seems to give the best results
+
+randomly filling in the mA mH of the background makes the parameters correlate with the label which is undesirable, learning from random choices from the signal is better but
+the ability to interpolate is reduced
+
+Proposed concept of using a GAN instead to get around these problems.
+
+Came up with concept of mapping mA,mH space as a function of likelihood to pass the network average over all other parameters to determine the interporability of the result
